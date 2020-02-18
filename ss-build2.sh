@@ -10,36 +10,53 @@ BUILD_ARCH=arm64
 LIBSODIUM_VER=1.0.16
 LIBMBEDTLS_VER=2.6.0
 PCRE_VER=8.41
-SHADOWSOCKS_VER=3.3.4
+SHADOWSOCKS_VER=v3.3.4
 CARES_VER=1.12.0
+
+case "$1" in
+	arm) BUILD_ARCH=arm; BUILD_HOST=arm-linux-androideabi;;
+	arm64) BUILD_ARCH=arm64; BUILD_HOST=aarch64-linux-android;;
+	x86) BUILD_ARCH=x86; BUILD_HOST=i686-linux-android;;
+	x86_64) BUILD_ARCH=x86_64; BUILD_HOST=x86_64-linux-android;;
+    init) prepare_ndk; exit 0;;
+	*) __errmsg "unknown arch $1, use default. Support arch: arm, arm64, x86, x86_64";;
+esac
 
 ###############
 # init env    #
 ###############
-export WORK_DIR=$PWD
-export BUILDTOOL_PATH=${WORK_DIR}/android-${BUILD_HOST}
-export NDK=${WORK_DIR}/android
-export SYSROOT="$NDK/sysroot"
-export PATH=$PATH:${BUILDTOOL_PATH}/bin
+init_env() {
+    export WORK_DIR=$PWD
+    export BUILDTOOL_PATH=${WORK_DIR}/android-${BUILD_HOST}
+    export NDK=${WORK_DIR}/android
+    export SYSROOT="$NDK/sysroot"
+    export PATH=$PATH:${BUILDTOOL_PATH}/bin
+    export STAGING_DIR=${BUILDTOOL_PATH}
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BUILDTOOL_PATH}/lib:${BUILDTOOL_PATH}/sysroot/usr/lib
+    export BUILD_INCLUDE_PATH=${BUILDTOOL_PATH}/sysroot/usr/include
+    export CC=${BUILD_HOST}-gcc
+    export CXX=${BUILD_HOST}-g++
+    export AR=${BUILD_HOST}-ar
+    export LD=${BUILD_HOST}-ld
+    export RANLIB=${BUILD_HOST}-ranlib
+}
 
-export STAGING_DIR=${BUILDTOOL_PATH}
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BUILDTOOL_PATH}/lib:${BUILDTOOL_PATH}/sysroot/usr/lib
-export BUILD_INCLUDE_PATH=${BUILDTOOL_PATH}/sysroot/usr/include
-export CC=${BUILD_HOST}-gcc
-export CXX=${BUILD_HOST}-g++
-export AR=${BUILD_HOST}-ar
-export LD=${BUILD_HOST}-ld
-export RANLIB=${BUILD_HOST}-ranlib
+init_buildfolder() {
+    mkdir build-${BUILD_ARCH}
+    cd build-${BUILD_ARCH}
+    mkdir insdir
+}
 
-mkdir insdir
-
-#build ndk
-build_ndk() {
-    echo "Build ndk..."
+prepare_ndk() {
+    echo "Prepare ndk..."
     wget https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
     unzip android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
     rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip ${NDK} ${BUILDTOOL_PATH}
     mv android-ndk-${ANDROID_NDK_VERSION} ${NDK}
+}
+
+#build ndk
+build_ndk() {
     ${NDK}/build/tools/make-standalone-toolchain.sh --arch=${BUILD_ARCH} --platform=android-${ANDROID_PLATFORM} --install-dir=${BUILDTOOL_PATH}
 }
 
@@ -89,13 +106,60 @@ ln -s ../insdir .
 make && make install
 cd -
 }
-build_ndk
-build_deps
 
-echo "build ss"
-git clone https://github.com/shadowsocks/shadowsocks-libev
-cd shadowsocks-libev
-git submodule update --init --recursive
-ln -s ../insdir .
-./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/shadowsocks-libev --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation --with-mbedtls=$PWD/insdir/mbedtls --with-pcre=$PWD/insdir/pcre --with-sodium=$PWD/insdir/libsodium LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
-make && make install
+build_ss() {
+    echo "build ss"
+    git clone https://github.com/shadowsocks/shadowsocks-libev
+    cd shadowsocks-libev
+    git checkout -b origin/${SHADOWSOCKS_VER}
+    git submodule update --init --recursive
+    ln -s ../insdir .
+    ./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/shadowsocks-libev --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation --with-mbedtls=$PWD/insdir/mbedtls --with-pcre=$PWD/insdir/pcre --with-sodium=$PWD/insdir/libsodium LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
+    make && make install
+    cd -
+    mkdir ../shadowsocks-libev-${BUILD_ARCH}
+    cp insdir/shadowsocks-libev/bin/ss-* ../shadowsocks-libev-${BUILD_ARCH}
+    cd ..
+    tar -zcvf shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz ./shadowsocks-libev-${BUILD_ARCH}/
+    rm -rf build-${BUILD_ARCH}
+}
+
+release_assets() {
+    git clone https://github.com/pgdurand/github-release-api.git
+    cd github-release-api
+    #create release tag
+    if [ ! -f .created ]; then
+        github_release_manager.sh \
+            -l TC_GITHUB_USERNAME -t TC_GITHUB_TOKEN \
+            -o tony-cloud -r ss-libev-build \
+            -d ${SHADOWSOCKS_VER} \
+            -c create
+        touch .created
+    fi
+    #push file to release
+    github_release_manager.sh \
+        -l TC_GITHUB_USERNAME -t TC_GITHUB_TOKEN \
+        -o tony-cloud -r ss-libev-build \
+        -d ${SHADOWSOCKS_VER} \
+        -c upload shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
+    cd -
+}
+
+########
+# main #
+########
+init_env
+init_buildfolder
+#prepare ndk if not found
+if [ ! -d ${NDK} ]; then
+    echo "NDK not found, download."
+    prepare_ndk
+fi
+#build if ndk not found
+if [ ! -d ${BUILDTOOL_PATH} ]; then
+    echo "NDK found but not build, build it."
+    build_ndk
+fi
+build_deps
+build_ss
+release_assets
