@@ -1,5 +1,8 @@
 #!/bin/sh
-BUILDTOOL_PATH=/usr/local/android-${BUILD_HOST}
+
+###############
+# config area #
+###############
 ANDROID_NDK_VERSION=r20b
 ANDROID_PLATFORM=29
 BUILD_HOST=aarch64-linux-android
@@ -10,9 +13,15 @@ PCRE_VER=8.41
 SHADOWSOCKS_VER=3.3.4
 CARES_VER=1.12.0
 
-export NDK=${BUILDTOOL_PATH}
+###############
+# init env    #
+###############
+export WORK_DIR=$PWD
+export BUILDTOOL_PATH=${WORK_DIR}/android-${BUILD_HOST}
+export NDK=${WORK_DIR}/android
 export SYSROOT="$NDK/sysroot"
 export PATH=$PATH:${BUILDTOOL_PATH}/bin
+
 export STAGING_DIR=${BUILDTOOL_PATH}
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BUILDTOOL_PATH}/lib:${BUILDTOOL_PATH}/sysroot/usr/lib
 export BUILD_INCLUDE_PATH=${BUILDTOOL_PATH}/sysroot/usr/include
@@ -24,12 +33,14 @@ export RANLIB=${BUILD_HOST}-ranlib
 
 mkdir insdir
 
+#build ndk
 build_ndk() {
+    echo "Build ndk..."
     wget https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
     unzip android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
-    rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip /usr/local/android /usr/local/android-${BUILD_HOST}
-    mv android-ndk-${ANDROID_NDK_VERSION} /usr/local/android
-    /usr/local/android/build/tools/make-standalone-toolchain.sh --arch=${BUILD_ARCH} --platform=android-${ANDROID_PLATFORM} --install-dir=/usr/local/android-${BUILD_HOST}
+    rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip ${NDK} ${BUILDTOOL_PATH}
+    mv android-ndk-${ANDROID_NDK_VERSION} ${NDK}
+    ${NDK}/build/tools/make-standalone-toolchain.sh --arch=${BUILD_ARCH} --platform=android-${ANDROID_PLATFORM} --install-dir=${BUILDTOOL_PATH}
 }
 
 build_deps() {
@@ -78,7 +89,6 @@ ln -s ../insdir .
 make && make install
 cd -
 }
-
 build_ndk
 build_deps
 
