@@ -53,6 +53,7 @@ prepare_ndk() {
     unzip android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
     rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip ${NDK} ${BUILDTOOL_PATH}
     mv android-ndk-${ANDROID_NDK_VERSION} ${NDK}
+    touch .ndk.installed
 }
 
 #build ndk
@@ -129,7 +130,7 @@ release_assets() {
     cd github-release-api
     #create release tag
     if [ ! -f .created ]; then
-        github_release_manager.sh \
+        ./github_release_manager.sh \
             -l TC_GITHUB_USERNAME -t TC_GITHUB_TOKEN \
             -o tony-cloud -r ss-libev-build \
             -d ${SHADOWSOCKS_VER} \
@@ -137,11 +138,11 @@ release_assets() {
         touch .created
     fi
     #push file to release
-    github_release_manager.sh \
+    ./github_release_manager.sh \
         -l TC_GITHUB_USERNAME -t TC_GITHUB_TOKEN \
         -o tony-cloud -r ss-libev-build \
         -d ${SHADOWSOCKS_VER} \
-        -c upload shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
+        -c upload ../shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
     cd -
 }
 
