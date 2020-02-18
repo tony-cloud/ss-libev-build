@@ -10,5 +10,5 @@ jobs:
     steps:
       - checkout
       - run:
-          command: chmod 0755 ss-build2.sh
-          command: /bin/sh ss-build2.sh
+          chmod 0755 ss-build2.sh
+          sh ss-build2.sh
