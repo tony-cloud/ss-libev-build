@@ -79,6 +79,7 @@ make && make install
 cd -
 }
 
+build_ndk
 build_deps
 
 echo "build ss"
