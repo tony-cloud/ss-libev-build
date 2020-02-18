@@ -132,7 +132,7 @@ release_assets() {
     #create release tag
     if [ ! -f .created ]; then
         ./github_release_manager.sh \
-            -l TC_GITHUB_USERNAME -t TC_GITHUB_TOKEN \
+            -l $TC_GITHUB_USERNAME -t $TC_GITHUB_TOKEN \
             -o tony-cloud -r ss-libev-build \
             -d ${SHADOWSOCKS_VER} \
             -c create
@@ -140,7 +140,7 @@ release_assets() {
     fi
     #push file to release
     ./github_release_manager.sh \
-        -l TC_GITHUB_USERNAME -t TC_GITHUB_TOKEN \
+        -l $TC_GITHUB_USERNAME -t $TC_GITHUB_TOKEN \
         -o tony-cloud -r ss-libev-build \
         -d ${SHADOWSOCKS_VER} \
         -c upload shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
