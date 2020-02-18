@@ -8,5 +8,6 @@ jobs:
     executor: python/default
         
     steps:
+      - checkout
       - run:
           command: ./ss-build2.sh
