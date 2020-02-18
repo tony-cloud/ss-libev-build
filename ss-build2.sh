@@ -128,6 +128,7 @@ build_ss() {
 release_assets() {
     git clone https://github.com/pgdurand/github-release-api.git
     cd github-release-api
+    cp ../shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz ./
     #create release tag
     if [ ! -f .created ]; then
         ./github_release_manager.sh \
@@ -142,7 +143,8 @@ release_assets() {
         -l TC_GITHUB_USERNAME -t TC_GITHUB_TOKEN \
         -o tony-cloud -r ss-libev-build \
         -d ${SHADOWSOCKS_VER} \
-        -c upload ../shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
+        -c upload shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
+    rm -f shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
     cd -
 }
 
