@@ -10,4 +10,4 @@ jobs:
     steps:
       - checkout
       - run:
-          chmod 0755 ss-build2.sh && ./ss-build2.sh arm && ./ss-build2.sh x86 && ./ss-build2.sh x86_64
+          chmod 0755 ss-build2.sh && ./ss-build2.sh x86_64
