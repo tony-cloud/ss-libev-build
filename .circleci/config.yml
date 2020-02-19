@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           name: Install Dependence
-          command: 'apt install libc-ares-dev libev-dev asciidoc xmlto'
+          command: 'sudo apt install libc-ares-dev libev-dev asciidoc xmlto'
       - run:
           name: Set script permission
           command: 'chmod 0755 ss-build2.sh'
