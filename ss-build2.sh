@@ -22,6 +22,7 @@ case "$1" in
 	*) __errmsg "unknown arch $1, use default. Support arch: arm, arm64, x86, x86_64";;
 esac
 
+uname -a
 ###############
 # init env    #
 ###############
