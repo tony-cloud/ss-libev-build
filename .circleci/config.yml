@@ -9,7 +9,21 @@ jobs:
         
     steps:
       - checkout
-      name: Install Dependence
+      - run:
+          name: Install Dependence
           command: 'apt install libc-ares-dev libev-dev asciidoc xmlto'
       - run:
-          chmod 0755 ss-build2.sh && ./ss-build2.sh x86_64 && ./ss-build2.sh arm && ./ss-build2.sh x86
+          name: Set script permission
+          command: 'chmod 0755 ss-build2.sh'
+      - run:
+          name: Build arm64
+          command: './ss-build2.sh'
+      - run:
+          name: Build x64
+          command: './ss-build2.sh x86_64'
+      - run:
+          name: Build arm
+          command: './ss-build2.sh arm'
+      - run:
+          name: Build x86
+          command: './ss-build2.sh x86'
