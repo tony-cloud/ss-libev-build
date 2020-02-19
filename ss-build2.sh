@@ -107,6 +107,13 @@ ln -s ../insdir .
 ./configure --host=${BUILD_HOST} LDFLAGS=-static --prefix=$PWD/insdir/cares
 make && make install
 cd -
+
+echo "Build simple obfs"
+git clone https://github.com/shadowsocks/simple-obfs.git
+cd simple-obfs
+git submodule update --init --recursive
+./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/simple-obfs --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
+make && make install
 }
 
 build_ss() {
@@ -122,6 +129,7 @@ build_ss() {
     mkdir ../shadowsocks-libev-${BUILD_ARCH}
     cp insdir/shadowsocks-libev/bin/ss-* ../shadowsocks-libev-${BUILD_ARCH}
     cd ..
+    cp insdir/simple-obfs/bin/obfs* ./shadowsocks-libev-${BUILD_ARCH}
     tar -zcvf shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz ./shadowsocks-libev-${BUILD_ARCH}/
     rm -rf build-${BUILD_ARCH}
 }

@@ -11,19 +11,10 @@ jobs:
       - checkout
       - run:
           name: Install Dependence
-          command: 'sudo apt install libc-ares-dev libev-dev asciidoc xmlto'
+          command: 'sudo apt install libc-ares-dev libev-dev asciidoc xmlto libssl-dev libpcre3-dev'
       - run:
           name: Set script permission
           command: 'chmod 0755 ss-build2.sh'
       - run:
           name: Build arm64
           command: './ss-build2.sh'
-      - run:
-          name: Build x64
-          command: './ss-build2.sh x86_64'
-      - run:
-          name: Build arm
-          command: './ss-build2.sh arm'
-      - run:
-          name: Build x86
-          command: './ss-build2.sh x86'
