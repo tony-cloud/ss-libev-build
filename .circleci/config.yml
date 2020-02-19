@@ -10,9 +10,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Dependence
-          command: 'sudo apt install libc-ares-dev libev-dev asciidoc xmlto libssl-dev libpcre3-dev'
-      - run:
           name: Set script permission
           command: 'chmod 0755 ss-build2.sh'
       - run:

@@ -112,8 +112,10 @@ echo "Build simple obfs"
 git clone https://github.com/shadowsocks/simple-obfs.git
 cd simple-obfs
 git submodule update --init --recursive
-./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/simple-obfs --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
+ln -s ../insdir .
+./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/simple-obfs --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation --with-pcre=$PWD/insdir/pcre --with-libev=$PWD/insdir/libev LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
 make && make install
+cd -
 }
 
 build_ss() {
@@ -123,7 +125,7 @@ build_ss() {
     git checkout -b origin/${SHADOWSOCKS_VER}
     git submodule update --init --recursive
     ln -s ../insdir .
-    ./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/shadowsocks-libev --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation --with-mbedtls=$PWD/insdir/mbedtls --with-pcre=$PWD/insdir/pcre --with-sodium=$PWD/insdir/libsodium LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
+    ./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/shadowsocks-libev --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation --with-mbedtls=$PWD/insdir/mbedtls --with-pcre=$PWD/insdir/pcre --with-sodium=$PWD/insdir/libsodium --with-libev=$PWD/insdir/libev LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
     make && make install
     cd -
     mkdir ../shadowsocks-libev-${BUILD_ARCH}
