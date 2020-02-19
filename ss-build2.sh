@@ -130,8 +130,8 @@ build_ss() {
     cd -
     mkdir ../shadowsocks-libev-${BUILD_ARCH}
     cp insdir/shadowsocks-libev/bin/ss-* ../shadowsocks-libev-${BUILD_ARCH}
-    cd ..
     cp insdir/simple-obfs/bin/obfs* ./shadowsocks-libev-${BUILD_ARCH}
+    cd ..
     tar -zcvf shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz ./shadowsocks-libev-${BUILD_ARCH}/
     rm -rf build-${BUILD_ARCH}
 }

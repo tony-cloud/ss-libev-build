@@ -15,3 +15,12 @@ jobs:
       - run:
           name: Build arm64
           command: './ss-build2.sh'
+      - run:
+          name: Build x64
+          command: './ss-build2.sh x86_64'
+      - run:
+          name: Build arm
+          command: './ss-build2.sh arm'
+      - run:
+          name: Build x86
+          command: './ss-build2.sh x86'
