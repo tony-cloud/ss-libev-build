@@ -131,7 +131,7 @@ release_assets() {
     TAG=${SHADOWSOCKS_VER}
     FILE_NAME=shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
     FILE_PATH=$PWD/shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz
-
+    chmod +x ./ok.sh
     # Create a release then upload a file:
     ./ok.sh create_release "$USER" "$REPO" "$TAG" _filter='.upload_url' \
         | sed 's/{.*$/?name='"$FILE_NAME"'/' \
