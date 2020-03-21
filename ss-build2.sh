@@ -56,12 +56,17 @@ init_buildfolder() {
 }
 
 prepare_ndk() {
-    echo "Prepare ndk..."
-    wget https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
-    unzip android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
-    rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip ${NDK} ${BUILDTOOL_PATH}
-    mv android-ndk-${ANDROID_NDK_VERSION} ${NDK}
-    touch .ndk.installed
+    if [ -f .ndk.installed ]; then
+      echo "NDK already installed, skip."
+      return 0
+    else
+      echo "Prepare ndk..."
+      wget https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
+      unzip android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
+      rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip ${NDK} ${BUILDTOOL_PATH}
+      mv android-ndk-${ANDROID_NDK_VERSION} ${NDK}
+      touch .ndk.installed
+    fi
 }
 
 #build ndk
