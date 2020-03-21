@@ -8,8 +8,20 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install build tools
+          command: 'sudo apt-get install -y gettext build-essential autoconf libtool asciidoc xmlto automake'
+      - restore_cache:
+          key: android-ndk
+      - run:
           name: Set script permission
           command: 'chmod 0755 ss-build2.sh'
+      - run:
+          name: Prepare ndk
+          command: './ss-build2.sh init'
+      - save_cache:
+          paths:
+            - android
+          key: android-ndk
       - run:
           name: Build arm64
           command: './ss-build2.sh'
