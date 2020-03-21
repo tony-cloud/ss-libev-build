@@ -123,6 +123,22 @@ ln -s ../insdir .
 ./autogen.sh && ./configure --host=${BUILD_HOST} --prefix=$PWD/insdir/simple-obfs --disable-assert --disable-ssp --disable-system-shared-lib --enable-static --disable-documentation --with-pcre=$PWD/insdir/pcre --with-libev=$PWD/insdir/libev LDFLAGS="-Wl -Wno-implicit-function-declaration -Wno-error,-static -static-libgcc -L$PWD/insdir/cares/lib -L$PWD/insdir/libev/lib -L${SYSROOT}/usr/lib -U__ANDROID__ -llog" CFLAGS="-I$PWD/insdir/libev/include -I$PWD/insdir/cares/include -I${BUILD_INCLUDE_PATH} -U__ANDROID__ -Wno-implicit-function-declaration -Wno-error -Wno-deprecated-declarations -fno-strict-aliasing"
 make && make install
 cd -
+
+echo "Build v2ray-plugin"
+git clone https://github.com/shadowsocks/v2ray-plugin.git
+cd v2ray-plugin
+ln -s ../insdir .
+if [ $BUILD_ARCH = "x86" ]; then
+  GOBUILD_ARCH="386"
+elif [ $BUILD_ARCH = "x86_64" ]; then
+  GOBUILD_ARCH=amd64
+elif [ $BUILD_ARCH = "arm" ]; then
+  GOBUILD_ARCH=arm7
+elif [ $BUILD_ARCH = "arm64" ]; then
+  GOBUILD_ARCH=arm64
+fi
+env CGO_ENABLED=0 GOOS=linux GOARCH=${GOBUILD_ARCH} go build -v -ldflags "-X main.VERSION=master -s -w" -gcflags "" -o insdir/v2ray-plugin/v2ray-plugin
+cd -
 }
 
 build_ss() {
@@ -138,6 +154,7 @@ build_ss() {
     mkdir ../shadowsocks-libev-${BUILD_ARCH}
     cp insdir/shadowsocks-libev/bin/ss-* ../shadowsocks-libev-${BUILD_ARCH}
     cp insdir/simple-obfs/bin/obfs* ../shadowsocks-libev-${BUILD_ARCH}
+    cp insdir/v2ray-plugin/v2ray-plug* ../shadowsocks-libev-${BUILD_ARCH}
     cd ..
     tar -zcvf shadowsocks-libev-${SHADOWSOCKS_VER}-${BUILD_ARCH}.tar.gz ./shadowsocks-libev-${BUILD_ARCH}/
     rm -rf build-${BUILD_ARCH}
