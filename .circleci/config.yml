@@ -11,7 +11,7 @@ jobs:
           name: Install build tools
           command: 'sudo apt-get install -y gettext build-essential autoconf libtool asciidoc xmlto automake gcc-multilib g++-multilib'
       - restore_cache:
-          key: android-ndk
+          key: android-ndk-r20b
       - run:
           name: Set script permission
           command: 'chmod 0755 ss-build2.sh'
@@ -21,7 +21,7 @@ jobs:
       - save_cache:
           paths:
             - android
-          key: android-ndk
+          key: android-ndk-r20b
       - run:
           name: Build arm64
           command: './ss-build2.sh'
