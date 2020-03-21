@@ -35,6 +35,13 @@ init_env() {
     export STAGING_DIR=${BUILDTOOL_PATH}
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BUILDTOOL_PATH}/lib:${BUILDTOOL_PATH}/sysroot/usr/lib
     export BUILD_INCLUDE_PATH=${BUILDTOOL_PATH}/sysroot/usr/include
+    if [ $BUILD_ARCH = "arm" ] || [ $BUILD_ARCH = "x86" ]; then
+      export CC="${BUILD_HOST}-gcc -m32"
+      export CXX="${BUILD_HOST}-g++ -m32"
+    else
+      export CC=${BUILD_HOST}-gcc
+      export CXX=${BUILD_HOST}-g++
+    fi
     export CC=${BUILD_HOST}-gcc
     export CXX=${BUILD_HOST}-g++
     export AR=${BUILD_HOST}-ar
@@ -68,7 +75,7 @@ wget https://tls.mbed.org/download/mbedtls-${LIBMBEDTLS_VER}-gpl.tgz -O mbedtls-
 tar -zxf mbedtls-${LIBMBEDTLS_VER}.tgz
 cd mbedtls-${LIBMBEDTLS_VER}
 ln -s ../insdir .
-make install DESTDIR=$PWD/insdir/mbedtls CC=${BUILD_HOST}-gcc AR=${BUILD_HOST}-ar LD=${BUILD_HOST}-ld LDFLAGS=-static
+make install DESTDIR=$PWD/insdir/mbedtls CC=${CC} AR=${AR} LD=${LD} LDFLAGS=-static
 cd -
 
 echo "Build libsodium..."
