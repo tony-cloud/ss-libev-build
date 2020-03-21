@@ -18,7 +18,7 @@ jobs:
           command: './ss-build2.sh init'
       - run:
           name: Build arm64
-          command: './ss-build2.sh'
+          command: './ss-build2.sh arm64'
       - run:
           name: Build x64
           command: './ss-build2.sh x86_64'
