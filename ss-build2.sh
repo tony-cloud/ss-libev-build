@@ -3,6 +3,9 @@
 ###############
 # config area #
 ###############
+export WORK_DIR=$PWD
+export NDK=${WORK_DIR}/android
+export SYSROOT="$NDK/sysroot"
 export ANDROID_NDK_VERSION=r20b
 ANDROID_PLATFORM=29
 BUILD_HOST=aarch64-linux-android
@@ -12,6 +15,20 @@ LIBMBEDTLS_VER=2.6.0
 PCRE_VER=8.41
 SHADOWSOCKS_VER=v3.3.4
 CARES_VER=1.12.0
+
+prepare_ndk() {
+    if [ -f .ndk.installed ]; then
+      echo "NDK already installed, skip."
+      return 0
+    else
+      echo "Prepare ndk..."
+      wget https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
+      unzip android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
+      rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
+      mv android-ndk-${ANDROID_NDK_VERSION} ${NDK}
+      touch .ndk.installed
+    fi
+}
 
 case "$1" in
 	arm) BUILD_ARCH=arm; BUILD_HOST=arm-linux-androideabi;;
@@ -27,10 +44,7 @@ uname -a
 # init env    #
 ###############
 init_env() {
-    export WORK_DIR=$PWD
     export BUILDTOOL_PATH=${WORK_DIR}/android-${BUILD_HOST}
-    export NDK=${WORK_DIR}/android
-    export SYSROOT="$NDK/sysroot"
     export PATH=$PATH:${BUILDTOOL_PATH}/bin
     export STAGING_DIR=${BUILDTOOL_PATH}
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BUILDTOOL_PATH}/lib:${BUILDTOOL_PATH}/sysroot/usr/lib
@@ -38,14 +52,13 @@ init_env() {
     if [ $BUILD_ARCH = "arm" ] || [ $BUILD_ARCH = "x86" ]; then
       export CC="${BUILD_HOST}-gcc -m32"
       export CXX="${BUILD_HOST}-g++ -m32"
+      export LD="${BUILD_HOST}-ld -m32"
     else
       export CC=${BUILD_HOST}-gcc
       export CXX=${BUILD_HOST}-g++
+      export LD=${BUILD_HOST}-ld
     fi
-    export CC=${BUILD_HOST}-gcc
-    export CXX=${BUILD_HOST}-g++
     export AR=${BUILD_HOST}-ar
-    export LD=${BUILD_HOST}-ld
     export RANLIB=${BUILD_HOST}-ranlib
 }
 
@@ -55,19 +68,7 @@ init_buildfolder() {
     mkdir insdir
 }
 
-prepare_ndk() {
-    if [ -f .ndk.installed ]; then
-      echo "NDK already installed, skip."
-      return 0
-    else
-      echo "Prepare ndk..."
-      wget https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
-      unzip android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip
-      rm -rf android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip ${NDK} ${BUILDTOOL_PATH}
-      mv android-ndk-${ANDROID_NDK_VERSION} ${NDK}
-      touch .ndk.installed
-    fi
-}
+
 
 #build ndk
 build_ndk() {
