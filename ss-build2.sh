@@ -32,9 +32,9 @@ prepare_ndk() {
 
 case "$1" in
 	arm) BUILD_ARCH=arm; BUILD_HOST=arm-linux-androideabi;;
-	arm64) BUILD_ARCH=arm64; BUILD_HOST=aarch64-linux-android; exit 0;;
+	arm64) BUILD_ARCH=arm64; BUILD_HOST=aarch64-linux-android;;
 	x86) BUILD_ARCH=x86; BUILD_HOST=i686-linux-android;;
-	x86_64) BUILD_ARCH=x86_64; BUILD_HOST=x86_64-linux-android; exit 0;;
+	x86_64) BUILD_ARCH=x86_64; BUILD_HOST=x86_64-linux-android;;
     init) prepare_ndk; exit 0;;
 	*) __errmsg "unknown arch $1, use default. Support arch: arm, arm64, x86, x86_64";;
 esac
