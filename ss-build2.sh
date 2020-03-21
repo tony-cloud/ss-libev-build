@@ -3,7 +3,7 @@
 ###############
 # config area #
 ###############
-ANDROID_NDK_VERSION=r20b
+export ANDROID_NDK_VERSION=r20b
 ANDROID_PLATFORM=29
 BUILD_HOST=aarch64-linux-android
 BUILD_ARCH=arm64
