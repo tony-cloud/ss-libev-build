@@ -1,11 +1,9 @@
-version: 2.1
-
-orbs:
-  python: circleci/python@0.2.1
+version: 2.23
 
 jobs:
   build:
-    executor: python/default
+    docker:
+      - image: circleci/golang:1.13
         
     steps:
       - checkout
