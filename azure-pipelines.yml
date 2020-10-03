@@ -1,0 +1,39 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: CmdLine@2
+  displayName: 'Install build requirement'
+  inputs:
+    script: 'sudo apt-get install -y gettext build-essential autoconf libtool asciidoc xmlto automake gcc-multilib g++-multilib'
+
+- task: CmdLine@2
+  displayName: 'Set script permission'
+  inputs:
+    script: 'chmod 0755 ss-build2.sh'
+
+- task: CmdLine@2
+  displayName: 'Build Android NDK'
+  inputs:
+    script: './ss-build2.sh init'
+- task: CmdLine@2
+  displayName: 'Build arm64'
+  inputs:
+    script: './ss-build2.sh arm64'
+- task: CmdLine@2
+  displayName: 'Build x64'
+  inputs:
+    script: './ss-build2.sh x86_64'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
