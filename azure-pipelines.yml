@@ -13,7 +13,7 @@ steps:
 - task: CmdLine@2
   displayName: 'Install build requirement'
   inputs:
-    script: 'sudo apt-get install -y gettext build-essential autoconf libtool asciidoc xmlto automake gcc-multilib g++-multilib'
+    script: 'sudo apt-get install -y gettext build-essential autoconf libtool asciidoc xmlto automake gcc-multilib g++-multilib libsodium-dev'
 
 - task: CmdLine@2
   displayName: 'Set script permission'
